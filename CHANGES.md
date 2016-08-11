@@ -1,5 +1,11 @@
 # Changes
 
+## cordova-sqlcipher-adapter 0.1.7
+
+- Fix Windows build
+- SQLCipher prerelease fix to use append mode for cipher_profile
+- SQLCipher for Android updates
+
 ## cordova-sqlcipher-adapter 0.1.6
 
 - SQLCipher for Android with API 23 fixes from: https://github.com/litehelpers/android-database-sqlcipher-api-fix
