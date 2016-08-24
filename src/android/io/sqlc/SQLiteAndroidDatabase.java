@@ -285,6 +285,24 @@ class SQLiteAndroidDatabase
             }
         }
     }
+	
+	private static Object[] getParamsFromJSON(JSONArray paramsAsJson) throws JSONException {
+		Object[] params = new Object[paramsAsJson.length()];
+
+		for (int i = 0; i < paramsAsJson.length(); i++) {
+			if (paramsAsJson.get(i) instanceof Float || paramsAsJson.get(i) instanceof Double) {
+				params[i] = paramsAsJson.getDouble(i);
+			} else if (paramsAsJson.get(i) instanceof Number) {
+				params[i] = paramsAsJson.getLong(i);
+			} else if (paramsAsJson.isNull(i)) {
+				params[i] = null;
+			} else {
+				params[i] = paramsAsJson.getString(i);
+			}
+		}
+		
+		return params;
+	}
 
     /**
      * Get rows results from query cursor.
@@ -299,17 +317,7 @@ class SQLiteAndroidDatabase
 
         Cursor cur = null;
         try {
-            String[] params = null;
-
-            params = new String[paramsAsJson.length()];
-
-            for (int j = 0; j < paramsAsJson.length(); j++) {
-                if (paramsAsJson.isNull(j))
-                    params[j] = "";
-                else
-                    params[j] = paramsAsJson.getString(j);
-            }
-
+            Object[] params = getParamsFromJSON(paramsAsJson);
             cur = mydb.rawQuery(query, params);
         } catch (Exception ex) {
             ex.printStackTrace();
