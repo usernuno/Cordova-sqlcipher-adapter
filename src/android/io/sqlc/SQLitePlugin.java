@@ -367,7 +367,7 @@ public class SQLitePlugin extends CordovaPlugin {
 
         public void run() {
             try {
-                logger.logWarning("Opening database (" +  + this.dbkey.hashCode() + ")", "SQLite");
+                logger.logWarning("Opening database (" + this.dbkey.hashCode() + ")", "SQLite");
                 this.mydb = openDatabase(dbname, this.dbkey, this.openCbc, false);
             } catch (Exception e) {
                 logger.logError("Error opening database: " + e.getMessage(), "SQLite");
