@@ -11,6 +11,9 @@ import android.annotation.SuppressLint;
 import android.util.Base64;
 import android.util.Log;
 
+import com.outsystems.plugins.oslogger.OSLogger;
+import com.outsystems.plugins.oslogger.interfaces.Logger;
+
 import java.io.File;
 import java.lang.IllegalArgumentException;
 import java.lang.Number;
@@ -42,6 +45,8 @@ public class SQLitePlugin extends CordovaPlugin {
      */
     static ConcurrentHashMap<String, DBRunner> dbrmap = new ConcurrentHashMap<String, DBRunner>();
 
+    Logger logger;
+
     /**
      * NOTE: Using default constructor, no explicit constructor.
      */
@@ -56,6 +61,7 @@ public class SQLitePlugin extends CordovaPlugin {
     @Override
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
+        logger = OSLogger.getInstance();
         SQLiteAndroidDatabase.initialize(cordova);
     }
 
@@ -361,8 +367,10 @@ public class SQLitePlugin extends CordovaPlugin {
 
         public void run() {
             try {
+                logger.logWarning("Opening database with key: " + this.dbkey, "SQLite");
                 this.mydb = openDatabase(dbname, this.dbkey, this.openCbc, false);
             } catch (Exception e) {
+                logger.logError("Error opening database: " + e.getMessage(), "SQLite");
                 Log.e(SQLitePlugin.class.getSimpleName(), "unexpected error, stopping db thread", e);
                 dbrmap.remove(dbname);
                 return;
@@ -374,11 +382,14 @@ public class SQLitePlugin extends CordovaPlugin {
                 dbq = q.take();
 
                 while (!dbq.stop) {
+                    //Too much logs!! let's not enable this for now...
+                    //logger.logWarning("Executing SqlBatch: " + dbq.queries, "SQLite");
                     mydb.executeSqlBatch(dbq.queries, dbq.jsonparams, dbq.queryIDs, dbq.cbc);
 
                     dbq = q.take();
                 }
             } catch (Exception e) {
+                logger.logError("Error executeSqlBatch: " + e.getMessage(), "SQLite");
                 Log.e(SQLitePlugin.class.getSimpleName(), "unexpected error", e);
             }
 
@@ -399,11 +410,13 @@ public class SQLitePlugin extends CordovaPlugin {
                                 dbq.cbc.error("couldn't delete database");
                             }
                         } catch (Exception e) {
+                            logger.logError("Error deleteDatabaseNow: " + e.getMessage(), "SQLite");
                             Log.e(SQLitePlugin.class.getSimpleName(), "couldn't delete database", e);
                             dbq.cbc.error("couldn't delete database: " + e);
                         }
                     }                    
                 } catch (Exception e) {
+                    logger.logError("Error closeDatabaseNow: " + e.getMessage(), "SQLite");
                     Log.e(SQLitePlugin.class.getSimpleName(), "couldn't close database", e);
                     if (dbq.cbc != null) {
                         dbq.cbc.error("couldn't close database: " + e);
