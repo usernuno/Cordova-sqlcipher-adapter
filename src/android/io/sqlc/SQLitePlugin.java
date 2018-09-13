@@ -382,8 +382,6 @@ public class SQLitePlugin extends CordovaPlugin {
                 dbq = q.take();
 
                 while (!dbq.stop) {
-                    //Too much logs!! let's not enable this for now...
-                    //logger.logWarning("Executing SqlBatch: " + dbq.queries, "SQLite");
                     mydb.executeSqlBatch(dbq.queries, dbq.jsonparams, dbq.queryIDs, dbq.cbc);
 
                     dbq = q.take();
